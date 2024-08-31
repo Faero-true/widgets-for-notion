@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор индекса Харви-Брэдшоу</title>
+    <style>
+        /* Подключение шрифтов */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            text-align: center;
+            color: #383690;
+            font-family: 'Montserrat', sans-serif;
+        }
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            border-collapse: collapse;
+            font-size: 16px; /* Увеличен базовый размер шрифта */
+        }
+        th, td {
+            border: 4px solid white; /* Увеличены границы */
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #383690;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px; /* Увеличен размер шрифта в первой строке */
+        }
+        td:first-child, td:last-child {
+            font-weight: bold; /* Жирный текст в первом и последнем столбце */
+            font-size: 18px; /* Увеличен размер шрифта в первом и последнем столбце */
+        }
+        tr:nth-child(2n) {
+            background-color: #E2DFF1;
+        }
+        tr:nth-child(2n+1) {
+            background-color: #D9D9D9;
+        }
+        .number-input {
+            display: inline-flex;
+            align-items: center;
+        }
+        .number-input button {
+            background-color: #383690;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .number-input button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .number-input input[type="number"] {
+            width: 60px;
+            text-align: center;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+            padding: 5px;
+            -moz-appearance: textfield;
+        }
+        .number-input input[type="number"]::-webkit-outer-spin-button,
+        .number-input input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        #result {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+            color: black;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .summary {
+            margin: 20px auto;
+            max-width: 600px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button.calculate-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #383690;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 0 10px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        button.calculate-btn:hover {
+            background-color: #2f2a7f;
+        }
+        button.reset-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #E2DFF1;
+            color: black;
+            border: none;
+            cursor: pointer;
+            margin: 0 10px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        button.reset-btn:hover {
+            background-color: #c5c0e4;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Калькулятор индекса Харви-Брэдшоу</h2>
+
+<form id="harveyBradshawForm">
+    <table>
+        <tr>
+            <th>Критерий оценки</th>
+            <th>Выраженность симптома</th>
+            <th>Баллы</th>
+        </tr>
+        <tr>
+            <td>Общее самочувствие накануне</td>
+            <td>
+                <label><input type="radio" name="wellbeing" value="0"> Очень хорошее</label><br>
+                <label><input type="radio" name="wellbeing" value="1"> Немного хуже обычного</label><br>
+                <label><input type="radio" name="wellbeing" value="2"> Плохое</label><br>
+                <label><input type="radio" name="wellbeing" value="3"> Очень плохое</label><br>
+                <label><input type="radio" name="wellbeing" value="4"> Ужасное</label>
+            </td>
+            <td>
+                <span>0</span><br>
+                <span>1</span><br>
+                <span>2</span><br>
+                <span>3</span><br>
+                <span>4</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Боль в животе накануне</td>
+            <td>
+                <label><input type="radio" name="abdominalPain" value="0"> Нет</label><br>
+                <label><input type="radio" name="abdominalPain" value="1"> Слабая</label><br>
+                <label><input type="radio" name="abdominalPain" value="2"> Умеренная</label><br>
+                <label><input type="radio" name="abdominalPain" value="3"> Сильная</label>
+            </td>
+            <td>
+                <span>0</span><br>
+                <span>1</span><br>
+                <span>2</span><br>
+                <span>3</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Частота жидкого или мягкого стула за день (например накануне)</td>
+            <td>
+                <div class="number-input">
+                    <button type="button" onclick="this.nextElementSibling.stepDown()">−</button>
+                    <input type="number" name="stoolFrequency" min="0" value="0">
+                    <button type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                </div>
+            </td>
+            <td>
+                <span>1 балл за каждую</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Пальпируемое образование в брюшной полости</td>
+            <td>
+                <label><input type="radio" name="palpableMass" value="0"> Нет</label><br>
+                <label><input type="radio" name="palpableMass" value="1"> Сомнительно</label><br>
+                <label><input type="radio" name="palpableMass" value="2"> Четко определяется</label><br>
+                <label><input type="radio" name="palpableMass" value="3"> Четко определяется, болезненно при пальпации</label>
+            </td>
+            <td>
+                <span>0</span><br>
+                <span>1</span><br>
+                <span>2</span><br>
+                <span>3</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Осложнения</td>
+            <td>
+                <div class="number-input">
+                    <button type="button" onclick="this.nextElementSibling.stepDown()">−</button>
+                    <input type="number" name="complications" min="0" value="0">
+                    <button type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                </div>
+            </td>
+            <td>
+                <span>1 балл за каждое</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="summary">
+        <p>Сумма баллов:</p>
+        <ul>
+            <li>≤ 4 баллов — ремиссия</li>
+            <li>5 - 7 баллов — легкое обострение средней тяжести</li>
+            <li>8 - 15 баллов — обострение средней тяжести</li>
+            <li>≥ 16 баллов — тяжелое обострение</li>
+        </ul>
+    </div>
+
+    <div class="button-container">
+        <button type="button" class="calculate-btn" onclick="calculateScore()">Рассчитать индекс</button>
+        <button type="button" class="reset-btn" onclick="resetForm()">Очистить</button>
+    </div>
+</form>
+
+<div id="result"></div>
+
+<script>
+    function calculateScore() {
+        let form = document.forms['harveyBradshawForm'];
+        let wellbeing = parseInt(form.elements['wellbeing'].value) || 0;
+        let abdominalPain = parseInt(form.elements['abdominalPain'].value) || 0;
+        let stoolFrequency = parseInt(form.elements['stoolFrequency'].value) || 0;
+        let palpableMass = parseInt(form.elements['palpableMass'].value) || 0;
+        let complications = parseInt(form.elements['complications'].value) || 0;
+
+        let totalScore = wellbeing + abdominalPain + stoolFrequency + palpableMass + complications;
+
+        let resultText = 'Ваш индекс Харви-Брэдшоу: ' + totalScore;
+
+        if (totalScore <= 4) {
+            resultText += ' - ремиссия';
+        } else if (totalScore >= 5 && totalScore <= 7) {
+            resultText += ' - легкое обострение средней тяжести';
+        } else if (totalScore >= 8 && totalScore <= 15) {
+            resultText += ' - обострение средней тяжести';
+        } else if (totalScore >= 16) {
+            resultText += ' - тяжелое обострение болезни Крона';
+        }
+
+        document.getElementById('result').textContent = resultText;
+    }
+
+    function resetForm() {
+        document.getElementById('harveyBradshawForm').reset();
+        document.getElementById('result').textContent = '';
+    }
+</script>
+
+</body>
+</html>
